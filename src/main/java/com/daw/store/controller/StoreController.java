@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 
+import static com.daw.store.Constants.ATTRIBUTE_LOGIN;
+
 @RestController
 @Slf4j
 public class StoreController {
@@ -25,7 +27,7 @@ public class StoreController {
                       HttpServletResponse resp) throws IOException {
         log.info("login for " + login);
         if (accountService.accountExists(login) && accountService.login(login, pass)) {
-            req.getSession().setAttribute("login", login);
+            req.getSession().setAttribute(ATTRIBUTE_LOGIN, login);
             resp.sendRedirect("/success");
         } else {
             resp.sendRedirect("/index.html");
@@ -42,7 +44,7 @@ public class StoreController {
         if (accountService.passwordConfirmed(pass, pass2)
                 && !accountService.accountExists(login)) {
             accountService.createAccount(login, pass);
-            req.getSession().setAttribute("login", login);
+            req.getSession().setAttribute(ATTRIBUTE_LOGIN, login);
             resp.sendRedirect("/success");
         } else {
             resp.sendRedirect("/index.html");
@@ -52,15 +54,15 @@ public class StoreController {
     @PostMapping("/unlogin")
     public void unlogin(HttpServletRequest req,
                         HttpServletResponse resp) throws IOException {
-        log.info("unlogin for " + req.getSession().getAttribute("login"));
-        req.getSession().removeAttribute("login");
+        log.info("unlogin for " + req.getSession().getAttribute(ATTRIBUTE_LOGIN));
+        req.getSession().removeAttribute(ATTRIBUTE_LOGIN);
         resp.sendRedirect("/index.html");
     }
 
     @GetMapping("/success")
     public String success(HttpServletRequest req,
                         HttpServletResponse resp) throws IOException {
-        var login = (String) req.getSession().getAttribute("login");
+        var login = (String) req.getSession().getAttribute(ATTRIBUTE_LOGIN);
         log.info("success for " + login);
         if (login != null) {
             return String.format("""
@@ -74,7 +76,7 @@ public class StoreController {
                     <div class="center470">
                     <h1>Login Successful for %s</h1>
                     <form action="/delete" method="post">
-                        <input type="hidden" name="login" value="%s">
+                        <input type="hidden" name="%s" value="%s">
                         <input type="submit" value="Delete" class="btn200" >
                     </form>
                     <form action="/unlogin" method="post">
@@ -83,7 +85,7 @@ public class StoreController {
                     </div>
                     </body>
                     </html>
-                    """, login, login);
+                    """, login, ATTRIBUTE_LOGIN, login);
         } else {
             resp.sendRedirect("/index.html");
             return null;
@@ -95,7 +97,7 @@ public class StoreController {
                        HttpServletRequest req,
                        HttpServletResponse resp) throws IOException {
         log.info("delete for " + login);
-        req.getSession().removeAttribute("login");
+        req.getSession().removeAttribute(ATTRIBUTE_LOGIN);
         accountService.deleteAccount(login);
         resp.sendRedirect("/index.html");
     }
