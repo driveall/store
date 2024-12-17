@@ -38,7 +38,7 @@ public class ViewController {
         var response = restTemplate.getForEntity(String.format(API_GET_URL, login), AccountEntity.class);
 
         var accountEntity = response.getBody();
-        if (accountEntity != null && accountService.login(accountEntity)) {
+        if (accountEntity != null && accountService.login(accountEntity, pass)) {
             addSessionAttribute(req, response.getBody().getLogin());
             redirect(resp, SUCCESS_PAGE_PATH);
         } else {
