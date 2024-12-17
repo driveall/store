@@ -14,8 +14,7 @@ public class DynamoDBAccountRepository implements AccountRepository {
 
     @Override
     public void save(Account account) {
-        var login = account.getLogin();
-        dynamoDBMapper.save(new Account(ACCOUNT_PREFIX + login, login, account.getPassword()));
+        dynamoDBMapper.save(account);
     }
 
     @Override

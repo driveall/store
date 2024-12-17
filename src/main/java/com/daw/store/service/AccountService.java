@@ -22,27 +22,19 @@ public class AccountService {
     }
 
     public void createAccount(AccountEntity accountEntity) {
-        var account = new Account();
-        account.setLogin(accountEntity.getLogin());
-        account.setPassword(accountEntity.getPassword());
-        accountRepository.save(account);
+        accountRepository.save(AccountEntityMapper.toAccount(accountEntity));
     }
 
     public boolean login(AccountEntity accountEntity) {
-        var account = new Account();
-        account.setLogin(accountEntity.getLogin());
-        var password = accountRepository.getByLogin(account).getPassword();
+        var password = accountRepository.getByLogin(AccountEntityMapper.toAccount(accountEntity)).getPassword();
         return accountEntity.getPassword().equals(password);
     }
 
     public void deleteAccount(AccountEntity accountEntity) {
-        var account = new Account();
-        account.setLogin(accountEntity.getLogin());
-        accountRepository.delete(account);
+        accountRepository.delete(AccountEntityMapper.toAccount(accountEntity));
     }
 
     public boolean passwordVerification(String pass1, String pass2) {
-
         return pass1 != null && pass1.equals(pass2);
     }
 
