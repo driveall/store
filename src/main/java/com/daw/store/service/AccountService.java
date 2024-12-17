@@ -1,5 +1,8 @@
 package com.daw.store.service;
 
+import com.daw.store.dynamodb.entity.Account;
+import com.daw.store.entity.AccountEntity;
+import com.daw.store.mapper.AccountEntityMapper;
 import com.daw.store.repo.AccountRepository;
 import org.springframework.stereotype.Service;
 
@@ -13,23 +16,43 @@ public class AccountService {
     }
 
     public boolean accountExists(String login) {
-        return accountRepository.exists(login);
+        var account = new Account();
+        account.setLogin(login);
+        return accountRepository.exists(account);
     }
 
-    public void createAccount(String login, String pass) {
-        accountRepository.save(login, pass);
+    public void createAccount(AccountEntity accountEntity) {
+        var account = new Account();
+        account.setLogin(accountEntity.getLogin());
+        account.setPassword(accountEntity.getPassword());
+        accountRepository.save(account);
     }
 
-    public boolean login(String login, String pass) {
-        var p = accountRepository.getPassword(login);
-        return login != null && pass != null && pass.equals(p);
+    public boolean login(AccountEntity accountEntity) {
+        var account = new Account();
+        account.setLogin(accountEntity.getLogin());
+        var password = accountRepository.getByLogin(account).getPassword();
+        return accountEntity.getPassword().equals(password);
     }
 
-    public void deleteAccount(String login) {
-        accountRepository.delete(login);
+    public void deleteAccount(AccountEntity accountEntity) {
+        var account = new Account();
+        account.setLogin(accountEntity.getLogin());
+        accountRepository.delete(account);
     }
 
-    public boolean passwordConfirmed(String pass1, String pass2) {
+    public boolean passwordVerification(String pass1, String pass2) {
+
         return pass1 != null && pass1.equals(pass2);
+    }
+
+    public AccountEntity getByLogin(String login) {
+        var account = new Account();
+        account.setLogin(login);
+        account = accountRepository.getByLogin(account);
+
+        if (account != null) {
+            return AccountEntityMapper.toAccountEntity(account);
+        } else return null;
     }
 }
