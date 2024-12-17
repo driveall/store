@@ -2,6 +2,7 @@ package com.daw.store.controller;
 
 import com.daw.store.entity.AccountEntity;
 import com.daw.store.service.AccountService;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,7 +17,7 @@ public class StoreController {
     }
 
     @GetMapping("/api/get")
-    public AccountEntity get(@RequestParam String login) {
+    public AccountEntity get(@NonNull @RequestParam String login) {
         log.info("api get for {}", login);
         var account = new AccountEntity();
         account.setLogin(login);
@@ -24,11 +25,11 @@ public class StoreController {
     }
 
     @PostMapping("/api/create")
-    public AccountEntity create(@RequestBody AccountEntity account) {
+    public AccountEntity create(@NonNull @RequestBody AccountEntity account) {
         log.info("api register for {}", account.getLogin());
         var login = account.getLogin();
         if (accountService.passwordVerification(account.getPassword(), account.getPasswordConfirmed())
-                && accountService.accountExists(login)) {
+                && !accountService.accountExists(login)) {
             accountService.createAccount(account);
             return accountService.getByLogin(account.getLogin());
         } else {
@@ -37,7 +38,7 @@ public class StoreController {
     }
 
     @DeleteMapping("/api/delete")
-    public int delete(@RequestParam String login) {
+    public int delete(@NonNull @RequestParam String login) {
         log.info("api delete for {}", login);
         var account = new AccountEntity();
         account.setLogin(login);

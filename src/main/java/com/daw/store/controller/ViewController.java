@@ -4,6 +4,7 @@ import com.daw.store.entity.AccountEntity;
 import com.daw.store.service.AccountService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -53,27 +54,22 @@ public class ViewController {
     }
 
     @PostMapping("/register")
-    public void register(@RequestParam String login,
-                         @RequestParam String pass,
-                         @RequestParam String pass2,
+    public void register(@NonNull @RequestParam String login,
+                         @NonNull @RequestParam String pass,
+                         @NonNull @RequestParam String pass2,
                          HttpServletRequest req,
                          HttpServletResponse resp) {
         log.info("register for {}", login);
-        if (accountService.passwordVerification(pass, pass2)
-                && accountService.accountExists(login)) {
-            var accountEntity = new AccountEntity();
-            accountEntity.setLogin(login);
-            accountEntity.setPassword(pass);
-            accountEntity.setPasswordConfirmed(pass2);
+        var accountEntity = new AccountEntity();
+        accountEntity.setLogin(login);
+        accountEntity.setPassword(pass);
+        accountEntity.setPasswordConfirmed(pass2);
 
-            var response = restTemplate.postForEntity(API_CREATE_URL, accountEntity, AccountEntity.class);
+        var response = restTemplate.postForEntity(API_CREATE_URL, accountEntity, AccountEntity.class);
 
-            if (response.getBody() != null) {
-                addSessionAttribute(req, response.getBody().getLogin());
-                redirect(resp, SUCCESS_PAGE_PATH);
-            } else {
-                redirect(resp, INDEX_PAGE_PATH);
-            }
+        if (response.getBody() != null) {
+            addSessionAttribute(req, response.getBody().getLogin());
+            redirect(resp, SUCCESS_PAGE_PATH);
         } else {
             redirect(resp, INDEX_PAGE_PATH);
         }
@@ -107,10 +103,7 @@ public class ViewController {
         log.info("delete for {}", login);
         removeSessionAttribute(req);
 
-        var accountEntity = new AccountEntity();
-        accountEntity.setLogin(login);
-
-        restTemplate.delete(String.format(API_DELETE_URL, login), accountEntity);
+        restTemplate.delete(String.format(API_DELETE_URL, login));
 
         redirect(resp, INDEX_PAGE_PATH);
     }
@@ -118,9 +111,11 @@ public class ViewController {
     private void addSessionAttribute(HttpServletRequest req, String login) {
         req.getSession().setAttribute(ATTRIBUTE_LOGIN, login);
     }
+
     private void removeSessionAttribute(HttpServletRequest req) {
         req.getSession().removeAttribute(ATTRIBUTE_LOGIN);
     }
+
     private String getSessionAttribute(HttpServletRequest req) {
         return (String) req.getSession().getAttribute(ATTRIBUTE_LOGIN);
     }
