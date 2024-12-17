@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -28,26 +29,18 @@ public class ViewController {
     }
 
     @PostMapping("/login")
-    public void login(@RequestParam String login,
-                      @RequestParam String pass,
+    public void login(@NonNull @RequestParam String login,
+                      @NonNull @RequestParam String pass,
                       HttpServletRequest req,
                       HttpServletResponse resp) {
         log.info("login for {}", login);
 
-        var accountEntity = new AccountEntity();
-        accountEntity.setLogin(login);
-        accountEntity.setPassword(pass);
-
         var response = restTemplate.getForEntity(String.format(API_GET_URL, login), AccountEntity.class);
 
-        if (response.getBody() != null) {
-            accountEntity = response.getBody();
-            if (accountService.login(accountEntity)) {
-                addSessionAttribute(req, response.getBody().getLogin());
-                redirect(resp, SUCCESS_PAGE_PATH);
-            } else {
-                redirect(resp, INDEX_PAGE_PATH);
-            }
+        var accountEntity = response.getBody();
+        if (accountEntity != null && accountService.login(accountEntity)) {
+            addSessionAttribute(req, response.getBody().getLogin());
+            redirect(resp, SUCCESS_PAGE_PATH);
         } else {
             redirect(resp, INDEX_PAGE_PATH);
         }
@@ -57,6 +50,8 @@ public class ViewController {
     public void register(@NonNull @RequestParam String login,
                          @NonNull @RequestParam String pass,
                          @NonNull @RequestParam String pass2,
+                         @Nullable @RequestParam(required = false) String email,
+                         @Nullable @RequestParam(required = false) String phone,
                          HttpServletRequest req,
                          HttpServletResponse resp) {
         log.info("register for {}", login);
@@ -64,6 +59,8 @@ public class ViewController {
         accountEntity.setLogin(login);
         accountEntity.setPassword(pass);
         accountEntity.setPasswordConfirmed(pass2);
+        accountEntity.setEmail(email);
+        accountEntity.setPhone(phone);
 
         var response = restTemplate.postForEntity(API_CREATE_URL, accountEntity, AccountEntity.class);
 
