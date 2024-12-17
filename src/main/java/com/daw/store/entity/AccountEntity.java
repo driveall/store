@@ -14,4 +14,6 @@ public class AccountEntity {
     private String login;
     private String password;
     private String passwordConfirmed;
+    private String email;
+    private String phone;
 }

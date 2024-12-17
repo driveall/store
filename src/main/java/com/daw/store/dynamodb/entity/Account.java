@@ -8,6 +8,8 @@ import lombok.*;
 import static com.daw.store.Constants.ATTRIBUTE_ID;
 import static com.daw.store.Constants.TABLE_NAME;
 
+@Getter
+@Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -20,28 +22,8 @@ public class Account {
     private String login;
     @DynamoDBAttribute
     private String password;
-
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
+    @DynamoDBAttribute
+    private String email;
+    @DynamoDBAttribute
+    private String phone;
 }

@@ -9,6 +9,8 @@ public class AccountEntityMapper {
         AccountEntity accountEntity = new AccountEntity();
         accountEntity.setLogin(account.getLogin());
         accountEntity.setPassword(account.getPassword());
+        accountEntity.setEmail(account.getEmail());
+        accountEntity.setPhone(account.getPhone());
         return accountEntity;
     }
     public static Account toAccount(AccountEntity accountEntity) {
@@ -16,6 +18,8 @@ public class AccountEntityMapper {
         account.setId(Constants.ACCOUNT_PREFIX + accountEntity.getLogin());
         account.setLogin(accountEntity.getLogin());
         account.setPassword(accountEntity.getPassword());
+        account.setEmail(accountEntity.getEmail());
+        account.setPhone(accountEntity.getPhone());
         return account;
     }
 }
