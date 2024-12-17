@@ -44,9 +44,6 @@ java {
 
 dependencies {
     // dynamoDB
-//    implementation platform('software.amazon.awssdk:bom:2.25.43')
-//    implementation 'software.amazon.awssdk:dynamodb-enhanced'
-//    implementation 'software.amazon.msk:aws-msk-iam-auth:2.0.2'
     implementation platform('com.amazonaws:aws-java-sdk-bom:1.12.529')
     implementation 'com.amazonaws:aws-java-sdk-dynamodb:1.12.529'
 
@@ -57,13 +54,9 @@ dependencies {
     // JSON
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2'
     implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.2'
-//    implementation 'com.google.code.gson:gson:2.10.1'
 
     // Logging - Log4j2
     annotationProcessor 'org.apache.logging.log4j:log4j-core:2.21.1'
-//    implementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.21.1'
-//    implementation 'org.apache.logging.log4j:log4j-core:2.21.1'
-//    implementation 'org.apache.logging.log4j:log4j-layout-template-json:2.21.1'
 
     // phone validation
     implementation 'com.googlecode.libphonenumber:libphonenumber:8.13.32'
