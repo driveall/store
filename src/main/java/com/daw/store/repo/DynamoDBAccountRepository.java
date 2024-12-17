@@ -10,7 +10,7 @@ import static com.daw.store.Constants.ACCOUNT_PREFIX;
 @Repository
 @AllArgsConstructor
 public class DynamoDBAccountRepository implements AccountRepository {
-    final private DynamoDBMapper dynamoDBMapper;
+    private final DynamoDBMapper dynamoDBMapper;
 
     @Override
     public void save(Account account) {
@@ -29,12 +29,6 @@ public class DynamoDBAccountRepository implements AccountRepository {
     }
 
     @Override
-    public String getPassword(Account account) {
-        Account load = dynamoDBMapper.load(Account.class, ACCOUNT_PREFIX + account.getLogin());
-        return load.getPassword();
-    }
-
-    @Override
     public void delete(Account account) {
         Account load = dynamoDBMapper.load(Account.class, ACCOUNT_PREFIX + account.getLogin());
         dynamoDBMapper.delete(load);
@@ -42,8 +36,7 @@ public class DynamoDBAccountRepository implements AccountRepository {
 
     @Override
     public Account getByLogin(Account account) {
-        var load = dynamoDBMapper.load(Account.class, ACCOUNT_PREFIX + account.getLogin());
-        return load;
+        return dynamoDBMapper.load(Account.class, ACCOUNT_PREFIX + account.getLogin());
     }
 
     public void update(Account account) {

@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @Deprecated
 public class LocalAccountRepository implements AccountRepository {
 
-    private Map<String, String> accounts = new ConcurrentHashMap<>();
+    private final Map<String, String> accounts = new ConcurrentHashMap<>();
 
     @Override
     public void save(Account account) {
@@ -22,14 +22,6 @@ public class LocalAccountRepository implements AccountRepository {
     @Override
     public boolean exists(Account account) {
         return accounts.get(account.getLogin()) != null;
-    }
-
-    @Override
-    public String getPassword(Account account) {
-        if (exists(account)) {
-            return accounts.get(account.getLogin());
-        }
-        return null;
     }
 
     @Override

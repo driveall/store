@@ -18,7 +18,7 @@ public class AccountService {
     public boolean accountExists(String login) {
         var account = new Account();
         account.setLogin(login);
-        return accountRepository.exists(account);
+        return !accountRepository.exists(account);
     }
 
     public void createAccount(AccountEntity accountEntity) {

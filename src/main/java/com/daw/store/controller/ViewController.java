@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
-import java.util.HashMap;
 
 import static com.daw.store.Constants.*;
 import static com.daw.store.Constants.ATTRIBUTE_LOGIN;
@@ -21,7 +20,7 @@ import static com.daw.store.Constants.ATTRIBUTE_LOGIN;
 @Slf4j
 public class ViewController {
     private final AccountService accountService;
-    private RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate = new RestTemplate();
 
     public ViewController(AccountService accountService) {
         this.accountService = accountService;
@@ -37,9 +36,6 @@ public class ViewController {
         var accountEntity = new AccountEntity();
         accountEntity.setLogin(login);
         accountEntity.setPassword(pass);
-
-        var params = new HashMap<String, String>();
-        params.put(ATTRIBUTE_LOGIN, login);
 
         var response = restTemplate.getForEntity(String.format(API_GET_URL, login), AccountEntity.class);
 
@@ -64,7 +60,7 @@ public class ViewController {
                          HttpServletResponse resp) {
         log.info("register for " + login);
         if (accountService.passwordVerification(pass, pass2)
-                && !accountService.accountExists(login)) {
+                && accountService.accountExists(login)) {
             var accountEntity = new AccountEntity();
             accountEntity.setLogin(login);
             accountEntity.setPassword(pass);

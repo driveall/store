@@ -28,7 +28,7 @@ public class StoreController {
         log.info("api register for " + account.getLogin());
         var login = account.getLogin();
         if (accountService.passwordVerification(account.getPassword(), account.getPasswordConfirmed())
-                && !accountService.accountExists(login)) {
+                && accountService.accountExists(login)) {
             accountService.createAccount(account);
             return accountService.getByLogin(account.getLogin());
         } else {
