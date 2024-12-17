@@ -1,7 +1,6 @@
 package com.daw.store.repo;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.daw.store.Constants;
 import com.daw.store.dynamodb.entity.Account;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -13,32 +12,43 @@ import static com.daw.store.Constants.ACCOUNT_PREFIX;
 public class DynamoDBAccountRepository implements AccountRepository {
     final private DynamoDBMapper dynamoDBMapper;
 
-    public void save(String login, String password) {
-        dynamoDBMapper.generateCreateTableRequest(Account.class);
-        dynamoDBMapper.save(new Account(ACCOUNT_PREFIX+login, login, password));
+    @Override
+    public void save(Account account) {
+        var login = account.getLogin();
+        dynamoDBMapper.save(new Account(ACCOUNT_PREFIX + login, login, account.getPassword()));
     }
 
-    public boolean exists(String login) {
-        dynamoDBMapper.generateCreateTableRequest(Account.class);
+    @Override
+    public boolean exists(Account account) {
         try {
-            Account load = dynamoDBMapper.load(Account.class, ACCOUNT_PREFIX + login);
+            Account load = dynamoDBMapper.load(Account.class, ACCOUNT_PREFIX + account.getLogin());
             return load != null;
         } catch (Exception e) {
             return false;
         }
     }
-    public String getPassword(String login) {
-        Account load = dynamoDBMapper.load(Account.class, ACCOUNT_PREFIX + login);
+
+    @Override
+    public String getPassword(Account account) {
+        Account load = dynamoDBMapper.load(Account.class, ACCOUNT_PREFIX + account.getLogin());
         return load.getPassword();
     }
-    public void delete(String login) {
-        Account load = dynamoDBMapper.load(Account.class, ACCOUNT_PREFIX + login);
+
+    @Override
+    public void delete(Account account) {
+        Account load = dynamoDBMapper.load(Account.class, ACCOUNT_PREFIX + account.getLogin());
         dynamoDBMapper.delete(load);
     }
 
-    public void update(String login, String password, String newPassword) {
-        Account load = dynamoDBMapper.load(Account.class, ACCOUNT_PREFIX + login);
-        load.setPassword(newPassword);
+    @Override
+    public Account getByLogin(Account account) {
+        var load = dynamoDBMapper.load(Account.class, ACCOUNT_PREFIX + account.getLogin());
+        return load;
+    }
+
+    public void update(Account account) {
+        Account load = dynamoDBMapper.load(Account.class, ACCOUNT_PREFIX + account.getLogin());
+        load.setPassword(account.getPassword());
         dynamoDBMapper.save(load);
     }
 }
