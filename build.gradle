@@ -1,0 +1,109 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.0'
+    id 'io.spring.dependency-management' version '1.1.6'
+    id 'org.asciidoctor.jvm.convert' version '3.3.2'
+}
+
+group = 'com.daw'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.daw.store.StoreApplication'
+    }
+}
+
+repositories {
+    maven {
+        name "DynamoDB Local Release Repository"
+        url "https://s3-us-west-2.amazonaws.com/dynamodb-local/release"
+    }
+    mavenCentral()
+    maven {
+        url "https://packages.confluent.io/maven"
+    }
+    maven { url 'https://repo.spring.io/milestone' }
+}
+
+ext {
+    set('snippetsDir', file("build/generated-snippets"))
+    set('springAiVersion', "1.0.0-M4")
+}
+
+java {
+    sourceCompatibility = JavaVersion.toVersion("21")
+    targetCompatibility = JavaVersion.toVersion("21")
+}
+
+dependencies {
+    // dynamoDB
+//    implementation platform('software.amazon.awssdk:bom:2.25.43')
+//    implementation 'software.amazon.awssdk:dynamodb-enhanced'
+//    implementation 'software.amazon.msk:aws-msk-iam-auth:2.0.2'
+    implementation platform('com.amazonaws:aws-java-sdk-bom:1.12.529')
+    implementation 'com.amazonaws:aws-java-sdk-dynamodb:1.12.529'
+
+    // Lombok - boilerplate code generator
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+
+    // JSON
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.18.2'
+    implementation 'com.fasterxml.jackson.dataformat:jackson-dataformat-yaml:2.18.2'
+//    implementation 'com.google.code.gson:gson:2.10.1'
+
+    // Logging - Log4j2
+    annotationProcessor 'org.apache.logging.log4j:log4j-core:2.21.1'
+//    implementation 'org.apache.logging.log4j:log4j-slf4j2-impl:2.21.1'
+//    implementation 'org.apache.logging.log4j:log4j-core:2.21.1'
+//    implementation 'org.apache.logging.log4j:log4j-layout-template-json:2.21.1'
+
+    // phone validation
+    implementation 'com.googlecode.libphonenumber:libphonenumber:8.13.32'
+
+    // email validation
+    implementation 'com.sun.mail:javax.mail:1.6.2'
+
+    // spring security (includes bcrypt)
+    implementation 'org.springframework.security:spring-security-crypto:6.3.0'
+
+    implementation 'org.springframework.boot:spring-boot-starter'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    runtimeOnly 'org.postgresql:postgresql'
+
+    // Test Dependencies
+
+    // Lombok - boilerplate code generator
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.30'
+    testCompileOnly 'org.projectlombok:lombok:1.18.30'
+
+    // Junit5 framework
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.10.1'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.8.0'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.10.1'
+
+    testImplementation "software.amazon.awssdk:url-connection-client:2.20.102"
+}
+
+dependencyManagement {
+    imports {
+        mavenBom 'com.amazonaws:aws-java-sdk-bom:1.12.529'
+    }
+    buildscript {
+        repositories {
+            mavenCentral()
+        }
+        dependencies {
+            classpath "io.spring.gradle:dependency-management-plugin:1.0.9.RELEASE"
+        }
+    }
+
+    apply plugin: "io.spring.dependency-management"
+}

@@ -1,0 +1,53 @@
+body {
+    background-color: lightblue;
+}
+
+h1 {
+    color: navy;
+    margin-left: 20px;
+}
+
+
+.center160 {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    height: 160px;
+    width: 200px;
+    border: 3px solid green;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+.center400 {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    height: 400px;
+    width: 360px;
+    border: 3px solid green;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+.center470 {
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    height: 470px;
+    width: 400px;
+    border: 3px solid green;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+}
+.btn200 {
+    height:80px;
+    width:200px;
+}
+.field200 {
+    height:40px;
+    width:200px;
+    position: relative;
+    left: 1%;
+}
