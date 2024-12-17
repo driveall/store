@@ -31,7 +31,7 @@ public class ViewController {
                       @RequestParam String pass,
                       HttpServletRequest req,
                       HttpServletResponse resp) {
-        log.info("login for " + login);
+        log.info("login for {}", login);
 
         var accountEntity = new AccountEntity();
         accountEntity.setLogin(login);
@@ -58,7 +58,7 @@ public class ViewController {
                          @RequestParam String pass2,
                          HttpServletRequest req,
                          HttpServletResponse resp) {
-        log.info("register for " + login);
+        log.info("register for {}", login);
         if (accountService.passwordVerification(pass, pass2)
                 && accountService.accountExists(login)) {
             var accountEntity = new AccountEntity();
@@ -82,7 +82,7 @@ public class ViewController {
     @PostMapping("/unlogin")
     public void unlogin(HttpServletRequest req,
                         HttpServletResponse resp) {
-        log.info("unlogin for " + req.getSession().getAttribute(ATTRIBUTE_LOGIN));
+        log.info("unlogin for {}", req.getSession().getAttribute(ATTRIBUTE_LOGIN));
         removeSessionAttribute(req);
         redirect(resp, INDEX_PAGE_PATH);
     }
@@ -91,7 +91,7 @@ public class ViewController {
     public String success(HttpServletRequest req,
                           HttpServletResponse resp) {
         var login = getSessionAttribute(req);
-        log.info("success for " + login);
+        log.info("success for {}", login);
         if (login != null) {
             return String.format(SUCCESS_PAGE_CONTENT, login, ATTRIBUTE_LOGIN, login);
         } else {
@@ -104,7 +104,7 @@ public class ViewController {
     public void delete(@RequestParam String login,
                        HttpServletRequest req,
                        HttpServletResponse resp) {
-        log.info("delete for " + login);
+        log.info("delete for {}", login);
         removeSessionAttribute(req);
 
         var accountEntity = new AccountEntity();
