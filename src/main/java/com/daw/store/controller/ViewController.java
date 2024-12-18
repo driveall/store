@@ -56,7 +56,7 @@ public class ViewController {
         log.info("success get");
         if (getSessionAttribute(req) != null) {
             var account = accountService.getByLogin(getSessionAttribute(req));
-            var mav = new ModelAndView("success");
+            var mav = new ModelAndView("main");
             mav.addObject("account", account);
             return mav;
         }

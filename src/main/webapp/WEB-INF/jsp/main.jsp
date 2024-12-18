@@ -8,8 +8,8 @@
     <style><%@include file="/WEB-INF/style/styles.css"%></style>
 </head>
 <body>
-<div class="center470">
-    <h1>Login Successful for ${account.login}</h1>
+<div class="center480">
+    <h1>Your login is ${account.login}</h1>
     <h2>Your email is ${account.email}</h2>
     <h2>Your phone is ${account.phone}</h2>
     <form action="/update" method="get">
