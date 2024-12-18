@@ -2,6 +2,7 @@ package com.daw.store.controller;
 
 import com.daw.store.entity.AccountEntity;
 import com.daw.store.service.AccountService;
+import com.daw.store.service.ValidationService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
@@ -23,10 +24,12 @@ import static com.daw.store.Constants.ATTRIBUTE_LOGIN;
 @Slf4j
 public class ViewController {
     private final AccountService accountService;
+    private final ValidationService validationService;
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public ViewController(AccountService accountService) {
+    public ViewController(AccountService accountService, ValidationService validationService) {
         this.accountService = accountService;
+        this.validationService = validationService;
     }
 
     @RequestMapping("/index")
@@ -106,8 +109,12 @@ public class ViewController {
         accountEntity.setLogin(login);
         accountEntity.setPassword(pass);
         accountEntity.setPasswordConfirmed(pass2);
-        accountEntity.setEmail(email);
-        accountEntity.setPhone(phone);
+        if (!email.isEmpty() && validationService.validateEmailAddress(email)) {
+            accountEntity.setEmail(email);
+        }
+        if (!phone.isEmpty() && validationService.validatePhoneNumber(phone)) {
+            accountEntity.setPhone(phone);
+        }
 
         var response = restTemplate.postForEntity(API_CREATE_URL, accountEntity, AccountEntity.class);
 
@@ -134,11 +141,11 @@ public class ViewController {
             accountEntity.setPassword(pass);
             accountEntity.setPasswordConfirmed(pass2);
         }
-        if (!email.isEmpty()) {
+        if (!email.isEmpty() && validationService.validateEmailAddress(email)) {
             accountEntity.setEmail(email);
         }
-        if (!phone.isEmpty()) {
-            accountEntity.setPhone(phone);
+        if (!phone.isEmpty() && validationService.validatePhoneNumber(phone)) {
+            accountEntity.setPhone(validationService.formatPhoneNumber(phone));
         }
 
         var response = restTemplate.postForEntity(API_UPDATE_URL, accountEntity, AccountEntity.class);
