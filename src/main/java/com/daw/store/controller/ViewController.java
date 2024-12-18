@@ -109,11 +109,11 @@ public class ViewController {
         accountEntity.setLogin(login);
         accountEntity.setPassword(pass);
         accountEntity.setPasswordConfirmed(pass2);
-        if (!email.isEmpty() && validationService.validateEmailAddress(email)) {
+        if (email != null && !email.isEmpty() && validationService.validateEmailAddress(email)) {
             accountEntity.setEmail(email);
         }
-        if (!phone.isEmpty() && validationService.validatePhoneNumber(phone)) {
-            accountEntity.setPhone(phone);
+        if (phone != null && !phone.isEmpty() && validationService.validatePhoneNumber(phone)) {
+            accountEntity.setPhone(validationService.formatPhoneNumber(phone));
         }
 
         var response = restTemplate.postForEntity(API_CREATE_URL, accountEntity, AccountEntity.class);
