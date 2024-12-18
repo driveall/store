@@ -40,9 +40,17 @@ public class AccountService {
     }
 
     public void createAccount(AccountEntity accountEntity) {
-        accountRepository.save(accountEntityMapper.toAccount(accountEntity, accountEntity.getPassword() != null
-                ? hashPassword(accountEntity.getPassword()).get()
-                : null));
+        accountEntity.setPassword(hashPassword(accountEntity.getPassword()).get());
+        accountRepository.save(accountEntityMapper.toAccount(accountEntity));
+    }
+
+    public void updateAccount(AccountEntity accountEntity) {
+        var load = getByLogin(accountEntity.getLogin());
+        if (accountEntity.getPassword() != null) {
+            accountEntity.setPassword(hashPassword(accountEntity.getPassword()).get());
+        }
+        accountEntityMapper.prepareUpdateEntity(load, accountEntity);
+        accountRepository.save(accountEntityMapper.toAccount(load));
     }
 
     public boolean login(AccountEntity accountEntity, String password) {
@@ -50,9 +58,10 @@ public class AccountService {
     }
 
     public void deleteAccount(AccountEntity accountEntity) {
-        accountRepository.delete(accountEntityMapper.toAccount(accountEntity, accountEntity.getPassword() != null
-                ? hashPassword(accountEntity.getPassword()).get()
-                : null));
+        if (accountEntity.getPassword() != null) {
+            accountEntity.setPassword(hashPassword(accountEntity.getPassword()).get());
+        }
+        accountRepository.delete(accountEntityMapper.toAccount(accountEntity));
     }
 
     public boolean passwordVerification(String pass1, String pass2) {

@@ -37,6 +37,18 @@ public class StoreController {
         }
     }
 
+    @PostMapping("/api/update")
+    public AccountEntity update(@NonNull @RequestBody AccountEntity account) {
+        log.info("api update for {}", account.getLogin());
+        var login = account.getLogin();
+        if (accountService.accountExists(login)) {
+            accountService.updateAccount(account);
+            return accountService.getByLogin(account.getLogin());
+        } else {
+            return null;
+        }
+    }
+
     @DeleteMapping("/api/delete")
     public int delete(@NonNull @RequestParam String login) {
         log.info("api delete for {}", login);

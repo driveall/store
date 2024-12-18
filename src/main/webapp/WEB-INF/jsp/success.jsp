@@ -9,9 +9,14 @@
 </head>
 <body>
 <div class="center470">
-    <h1>Login Successful for ${login}</h1>
+    <h1>Login Successful for ${account.login}</h1>
+    <h2>Your email is ${account.email}</h2>
+    <h2>Your phone is ${account.phone}</h2>
+    <form action="/update" method="get">
+        <input type="submit" value="Update" class="btn200" >
+    </form>
     <form action="/delete" method="post">
-        <input type="hidden" name="login" value="${login}">
+        <input type="hidden" name="login" value="${account.login}">
         <input type="submit" value="Delete" class="btn200" >
     </form>
     <form action="/unlogin" method="post">

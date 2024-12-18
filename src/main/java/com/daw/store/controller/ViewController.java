@@ -48,11 +48,31 @@ public class ViewController {
     }
 
     @GetMapping("/success")
-    public ModelAndView getSuccess(@RequestParam String login) {
-        log.info("success get for {}", login);
-        var mav = new ModelAndView("success");
-        mav.addObject("login", login);
-        return mav;
+    public ModelAndView getSuccess(HttpServletRequest req,
+                                   HttpServletResponse resp) throws IOException {
+        log.info("success get");
+        if (getSessionAttribute(req) != null) {
+            var account = accountService.getByLogin(getSessionAttribute(req));
+            var mav = new ModelAndView("success");
+            mav.addObject("account", account);
+            return mav;
+        }
+        resp.sendRedirect(INDEX_PAGE_PATH);
+        return null;
+    }
+
+    @GetMapping("/update")
+    public ModelAndView getUpdate(HttpServletRequest req,
+                                  HttpServletResponse resp) throws IOException {
+        log.info("update get");
+        if (getSessionAttribute(req) != null) {
+            var account = accountService.getByLogin(getSessionAttribute(req));
+            var mav = new ModelAndView("update");
+            mav.addObject("account", account);
+            return mav;
+        }
+        resp.sendRedirect(INDEX_PAGE_PATH);
+        return null;
     }
 
     @PostMapping("/login")
@@ -67,7 +87,7 @@ public class ViewController {
         var accountEntity = response.getBody();
         if (accountEntity != null && accountService.login(accountEntity, pass)) {
             addSessionAttribute(req, response.getBody().getLogin());
-            redirect(resp, String.format(SUCCESS_PAGE_PATH, login));
+            redirect(resp, SUCCESS_PAGE_PATH);
         } else {
             redirect(resp, INDEX_PAGE_PATH);
         }
@@ -93,7 +113,39 @@ public class ViewController {
 
         if (response.getBody() != null) {
             addSessionAttribute(req, response.getBody().getLogin());
-            redirect(resp, String.format(SUCCESS_PAGE_PATH, login));
+            redirect(resp, SUCCESS_PAGE_PATH);
+        } else {
+            redirect(resp, INDEX_PAGE_PATH);
+        }
+    }
+
+    @PostMapping("/update")
+    public void update(@NonNull @RequestParam String login,
+                       @NonNull @RequestParam String pass,
+                       @NonNull @RequestParam String pass2,
+                       @NonNull @RequestParam String email,
+                       @NonNull @RequestParam String phone,
+                       HttpServletRequest req,
+                       HttpServletResponse resp) {
+        log.info("update for {}", login);
+        var accountEntity = new AccountEntity();
+        accountEntity.setLogin(login);
+        if (!pass.isEmpty()) {
+            accountEntity.setPassword(pass);
+            accountEntity.setPasswordConfirmed(pass2);
+        }
+        if (!email.isEmpty()) {
+            accountEntity.setEmail(email);
+        }
+        if (!phone.isEmpty()) {
+            accountEntity.setPhone(phone);
+        }
+
+        var response = restTemplate.postForEntity(API_UPDATE_URL, accountEntity, AccountEntity.class);
+
+        if (response.getBody() != null) {
+            addSessionAttribute(req, response.getBody().getLogin());
+            redirect(resp, SUCCESS_PAGE_PATH);
         } else {
             redirect(resp, INDEX_PAGE_PATH);
         }

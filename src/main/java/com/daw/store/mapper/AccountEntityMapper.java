@@ -15,13 +15,18 @@ public class AccountEntityMapper {
         accountEntity.setPhone(account.getPhone());
         return accountEntity;
     }
-    public Account toAccount(AccountEntity accountEntity, String hashedPassword) {
+    public Account toAccount(AccountEntity accountEntity) {
         Account account = new Account();
         account.setId(Constants.ACCOUNT_PREFIX + accountEntity.getLogin());
         account.setLogin(accountEntity.getLogin());
-        account.setPassword(hashedPassword);
+        account.setPassword(accountEntity.getPassword());
         account.setEmail(accountEntity.getEmail());
         account.setPhone(accountEntity.getPhone());
         return account;
+    }
+    public void prepareUpdateEntity(AccountEntity load, AccountEntity accountEntity) {
+        if (accountEntity.getPassword() != null) load.setPassword(accountEntity.getPassword());
+        if (accountEntity.getEmail() != null) load.setEmail(accountEntity.getEmail());
+        if (accountEntity.getPhone() != null) load.setPhone(accountEntity.getPhone());
     }
 }
