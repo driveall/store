@@ -3,6 +3,7 @@ package com.daw.store.dynamodb.entity;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
+import com.daw.store.enums.ItemType;
 import lombok.*;
 
 import static com.daw.store.Constants.ATTRIBUTE_ID;
@@ -14,37 +15,22 @@ import static com.daw.store.Constants.TABLE_NAME;
 @AllArgsConstructor
 @NoArgsConstructor
 @DynamoDBTable(tableName = TABLE_NAME)
-public class Account {
+public class Item {
     @DynamoDBHashKey(attributeName = ATTRIBUTE_ID)
     @DynamoDBAttribute
     private String id;
     @DynamoDBAttribute
-    private String login;
+    private String name;
     @DynamoDBAttribute
-    private String password;
+    private Integer points;
     @DynamoDBAttribute
-    private String email;
+    private String description;
     @DynamoDBAttribute
-    private String phone;
-
+    private String image;
     @DynamoDBAttribute
-    private Integer money;
+    private Integer level;
     @DynamoDBAttribute
-    private String head;
+    private Integer price;
     @DynamoDBAttribute
-    private String body;
-    @DynamoDBAttribute
-    private String legs;
-    @DynamoDBAttribute
-    private String weapon;
-    @DynamoDBAttribute
-    private String storage;
-
-    @DynamoDBAttribute
-    private String createdAt;
-    @DynamoDBAttribute
-    private String updatedAt;
-    @DynamoDBAttribute
-    private String passwordChangedAt;
-
+    private ItemType type;
 }

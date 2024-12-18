@@ -2,8 +2,11 @@ package com.daw.store.service;
 
 import com.daw.store.dynamodb.entity.Account;
 import com.daw.store.entity.AccountEntity;
+import com.daw.store.entity.ItemEntity;
 import com.daw.store.mapper.AccountEntityMapper;
+import com.daw.store.mapper.ItemEntityMapper;
 import com.daw.store.repo.AccountRepository;
+import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -13,6 +16,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.HashSet;
 import java.util.Optional;
 
 @Service
@@ -27,10 +31,12 @@ public class AccountService {
 
     private final AccountRepository accountRepository;
     private final AccountEntityMapper accountEntityMapper;
+    private final ItemEntityMapper itemEntityMapper;
 
-    public AccountService(AccountRepository accountRepository, AccountEntityMapper accountEntityMapper) {
+    public AccountService(AccountRepository accountRepository, AccountEntityMapper accountEntityMapper, ItemEntityMapper itemEntityMapper) {
         this.accountRepository = accountRepository;
         this.accountEntityMapper = accountEntityMapper;
+        this.itemEntityMapper = itemEntityMapper;
     }
 
     public boolean accountExists(String login) {
@@ -41,6 +47,11 @@ public class AccountService {
 
     public void createAccount(AccountEntity accountEntity) {
         accountEntity.setPassword(hashPassword(accountEntity.getPassword()).get());
+        accountEntity.setMoney(20);
+        accountEntity.setStorage(new HashSet<>());
+        accountEntity.setCreatedAt(DateTime.now().toString());
+        accountEntity.setUpdatedAt(DateTime.now().toString());
+        accountEntity.setPasswordChangedAt(DateTime.now().toString());
         accountRepository.save(accountEntityMapper.toAccount(accountEntity));
     }
 
@@ -74,7 +85,7 @@ public class AccountService {
         account = accountRepository.getByLogin(account);
 
         if (account != null) {
-            return accountEntityMapper.toAccountEntity(account);
+            return accountEntityMapper.toAccountEntity(account, this);
         } else return null;
     }
 
@@ -97,5 +108,9 @@ public class AccountService {
         } finally {
             spec.clearPassword();
         }
+    }
+
+    public ItemEntity getItem(String itemId) {
+        return itemEntityMapper.toItemEntity(accountRepository.getByItemId(itemId));
     }
 }
