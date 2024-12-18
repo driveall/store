@@ -18,8 +18,9 @@
     </form>
     <form action="/delete" method="post">
         <input type="hidden" name="login" value="${account.login}">
-        <input type="submit" value="Delete" class="btn300" >
+        <input type="submit" value="Delete" class="btn300" onclick="change()">
     </form>
+
     <form action="/unlogin" method="post">
         <input type="submit" value="Unlogin" class="btn300" >
     </form>
@@ -35,6 +36,11 @@
     <form action="/shop" method="get">
         <input type="submit" value="To Shop" class="btn300" >
     </form>
+    <script>
+        function change(){
+            alert();
+        }
+    </script>
 </div>
 </body>
 </html>
