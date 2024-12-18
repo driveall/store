@@ -30,12 +30,12 @@ h1 {
     -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
 }
-.center480 {
+.center700 {
     margin: 0;
     position: absolute;
     top: 50%;
     left: 50%;
-    height: 480px;
+    height: 700px;
     width: 360px;
     border: 3px solid green;
     -ms-transform: translate(-50%, -50%);
@@ -65,6 +65,10 @@ h1 {
 .btn200 {
     height:80px;
     width:200px;
+}
+.btn300 {
+    height:42px;
+    width:300px;
 }
 .field200 {
     height:40px;
