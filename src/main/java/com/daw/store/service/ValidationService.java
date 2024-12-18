@@ -45,9 +45,6 @@ public class ValidationService {
         } catch (Exception ex) {
             return false;
         }
-        if (!FULL_EMAIL_STRICT_PATTERN.matcher(emailAddress).matches()) {
-            return false;
-        }
-        return true;
+        return FULL_EMAIL_STRICT_PATTERN.matcher(emailAddress).matches();
     }
 }
