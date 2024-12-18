@@ -7,18 +7,19 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.io.IOException;
 
 import static com.daw.store.Constants.*;
 import static com.daw.store.Constants.ATTRIBUTE_LOGIN;
 
-@RestController
+@EnableWebMvc
+@Controller
 @Slf4j
 public class ViewController {
     private final AccountService accountService;
@@ -26,6 +27,32 @@ public class ViewController {
 
     public ViewController(AccountService accountService) {
         this.accountService = accountService;
+    }
+
+    @RequestMapping("/index")
+    public ModelAndView getIndex() {
+        log.info("index get");
+        return new ModelAndView("index");
+    }
+
+    @GetMapping("/login")
+    public ModelAndView getLogin() {
+        log.info("login get");
+        return new ModelAndView("login");
+    }
+
+    @GetMapping("/register")
+    public ModelAndView getRegister() {
+        log.info("register get");
+        return new ModelAndView("register");
+    }
+
+    @GetMapping("/success")
+    public ModelAndView getSuccess(@RequestParam String login) {
+        log.info("success get for {}", login);
+        var mav = new ModelAndView("success");
+        mav.addObject("login", login);
+        return mav;
     }
 
     @PostMapping("/login")
@@ -40,7 +67,7 @@ public class ViewController {
         var accountEntity = response.getBody();
         if (accountEntity != null && accountService.login(accountEntity, pass)) {
             addSessionAttribute(req, response.getBody().getLogin());
-            redirect(resp, SUCCESS_PAGE_PATH);
+            redirect(resp, String.format(SUCCESS_PAGE_PATH, login));
         } else {
             redirect(resp, INDEX_PAGE_PATH);
         }
@@ -66,7 +93,7 @@ public class ViewController {
 
         if (response.getBody() != null) {
             addSessionAttribute(req, response.getBody().getLogin());
-            redirect(resp, SUCCESS_PAGE_PATH);
+            redirect(resp, String.format(SUCCESS_PAGE_PATH, login));
         } else {
             redirect(resp, INDEX_PAGE_PATH);
         }
@@ -78,19 +105,6 @@ public class ViewController {
         log.info("unlogin for {}", req.getSession().getAttribute(ATTRIBUTE_LOGIN));
         removeSessionAttribute(req);
         redirect(resp, INDEX_PAGE_PATH);
-    }
-
-    @GetMapping("/success")
-    public String success(HttpServletRequest req,
-                          HttpServletResponse resp) {
-        var login = getSessionAttribute(req);
-        log.info("success for {}", login);
-        if (login != null) {
-            return String.format(SUCCESS_PAGE_CONTENT, login, ATTRIBUTE_LOGIN, login);
-        } else {
-            redirect(resp, INDEX_PAGE_PATH);
-            return null;
-        }
     }
 
     @PostMapping("/delete")
