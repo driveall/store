@@ -8,7 +8,8 @@ import com.daw.store.service.AccountService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -31,9 +32,9 @@ public class AccountEntityMapper {
         if (account.getWeapon() != null && !account.getWeapon().isEmpty())
             accountEntity.setWeapon(ItemEntity.fromJson(account.getWeapon()));
         try {
-            Set<String> itemIds = new ObjectMapper().readValue(account.getStorage(), HashSet.class);
+            List<String> itemIds = new ObjectMapper().readValue(account.getStorage(), LinkedList.class);
             Set<ItemEntity> items = itemIds.stream()
-                    .map(itemId -> accountService.getItem(itemId))
+                    .map(accountService::getItem)
                     .collect(Collectors.toSet());
             accountEntity.setStorage(items);
         } catch (Exception e) {
@@ -59,7 +60,10 @@ public class AccountEntityMapper {
         if (accountEntity.getLegs() != null) account.setLegs(accountEntity.getLegs().toJson());
         if (accountEntity.getWeapon() != null) account.setWeapon(accountEntity.getWeapon().toJson());
         try {
-            account.setStorage(new ObjectMapper().writeValueAsString(accountEntity.getStorage()));
+            var itemIds = accountEntity.getStorage().stream()
+                    .map(ItemEntity::getId)
+                    .collect(Collectors.toList());
+            account.setStorage(new ObjectMapper().writeValueAsString(itemIds));
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

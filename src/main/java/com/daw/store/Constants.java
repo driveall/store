@@ -8,6 +8,8 @@ public class Constants {
     public static final String ACCOUNT_PREFIX = "ACCOUNT:";
 
     public static final String INDEX_PAGE_PATH = "/index";
+    public static final String SHOP_PAGE_PATH = "/shop";
+    public static final String WEAR_PAGE_PATH = "/wear";
     public static final String SUCCESS_PAGE_PATH = "/success";
 
     public static final String API_GET_URL = "http://localhost:8080/api/get?login=%s";

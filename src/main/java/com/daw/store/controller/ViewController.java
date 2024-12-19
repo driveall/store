@@ -1,8 +1,11 @@
 package com.daw.store.controller;
 
 import com.daw.store.entity.AccountEntity;
+import com.daw.store.entity.ItemEntity;
 import com.daw.store.service.AccountService;
 import com.daw.store.service.ValidationService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
@@ -15,6 +18,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.io.IOException;
+import java.util.HashSet;
 
 import static com.daw.store.Constants.*;
 import static com.daw.store.Constants.ATTRIBUTE_LOGIN;
@@ -58,6 +62,43 @@ public class ViewController {
             var account = accountService.getByLogin(getSessionAttribute(req));
             var mav = new ModelAndView("main");
             mav.addObject("account", account);
+            return mav;
+        }
+        resp.sendRedirect(INDEX_PAGE_PATH);
+        return null;
+    }
+
+    @GetMapping("/shop")
+    public ModelAndView getShop(HttpServletRequest req,
+                                   HttpServletResponse resp) throws IOException {
+        log.info("shop get");
+        if (getSessionAttribute(req) != null) {
+            var account = accountService.getByLogin(getSessionAttribute(req));
+            var stuff = new HashSet<ItemEntity>();
+            stuff.add(accountService.getItem("ITEM:1"));
+            stuff.add(accountService.getItem("ITEM:2"));
+            stuff.add(accountService.getItem("ITEM:3"));
+            stuff.add(accountService.getItem("ITEM:4"));
+            stuff.removeAll(account.getStorage());
+            var mav = new ModelAndView("shop");
+            mav.addObject("account", account);
+            mav.addObject("stuff", stuff);
+            return mav;
+        }
+        resp.sendRedirect(INDEX_PAGE_PATH);
+        return null;
+    }
+
+    @GetMapping("/wear")
+    public ModelAndView getWear(HttpServletRequest req,
+                                HttpServletResponse resp) throws IOException {
+        log.info("wear get");
+        if (getSessionAttribute(req) != null) {
+            var account = accountService.getByLogin(getSessionAttribute(req));
+
+            var mav = new ModelAndView("wear");
+            mav.addObject("account", account);
+
             return mav;
         }
         resp.sendRedirect(INDEX_PAGE_PATH);
@@ -176,6 +217,50 @@ public class ViewController {
         restTemplate.delete(String.format(API_DELETE_URL, login));
 
         redirect(resp, INDEX_PAGE_PATH);
+    }
+
+    @PostMapping("/buy")
+    public void buy(@RequestParam String itemId,
+                       HttpServletRequest req,
+                       HttpServletResponse resp) {
+        log.info("buy {}", itemId);
+
+        accountService.buy(getSessionAttribute(req), itemId);
+
+        redirect(resp, SHOP_PAGE_PATH);
+    }
+
+    @PostMapping("/sell")
+    public void sell(@RequestParam String itemId,
+                    HttpServletRequest req,
+                    HttpServletResponse resp) {
+        log.info("sell {}", itemId);
+
+        accountService.sell(getSessionAttribute(req), itemId);
+
+        redirect(resp, SHOP_PAGE_PATH);
+    }
+
+    @PostMapping("/wear")
+    public void wear(@RequestParam String itemId,
+                     HttpServletRequest req,
+                     HttpServletResponse resp) {
+        log.info("wear {}", itemId);
+
+        accountService.wear(getSessionAttribute(req), itemId);
+
+        redirect(resp, WEAR_PAGE_PATH);
+    }
+
+    @PostMapping("/unwear")
+    public void unwear(@RequestParam String itemId,
+                     HttpServletRequest req,
+                     HttpServletResponse resp) {
+        log.info("unwear {}", itemId);
+
+        accountService.unwear(getSessionAttribute(req), itemId);
+
+        redirect(resp, WEAR_PAGE_PATH);
     }
 
     private void addSessionAttribute(HttpServletRequest req, String login) {

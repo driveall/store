@@ -47,4 +47,20 @@ public class Account {
     @DynamoDBAttribute
     private String passwordChangedAt;
 
+    //ITEM
+    @DynamoDBAttribute
+    private String name;
+    @DynamoDBAttribute
+    private Integer points;
+    @DynamoDBAttribute
+    private String description;
+    @DynamoDBAttribute
+    private String image;
+    @DynamoDBAttribute
+    private Integer level;
+    @DynamoDBAttribute
+    private Integer price;
+    @DynamoDBAttribute
+    private String type;
+
 }

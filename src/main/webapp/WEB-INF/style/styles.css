@@ -62,6 +62,10 @@ h1 {
     -ms-transform: translate(-50%, -50%);
     transform: translate(-50%, -50%);
 }
+.btn50 {
+    height:20px;
+    width:60px;
+}
 .btn200 {
     height:80px;
     width:200px;

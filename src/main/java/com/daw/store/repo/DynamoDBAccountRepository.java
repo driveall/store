@@ -2,7 +2,6 @@ package com.daw.store.repo;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.daw.store.dynamodb.entity.Account;
-import com.daw.store.dynamodb.entity.Item;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -40,8 +39,8 @@ public class DynamoDBAccountRepository implements AccountRepository {
     }
 
     @Override
-    public Item getByItemId(String itemId) {
-        return dynamoDBMapper.load(Item.class, ACCOUNT_PREFIX + itemId);
+    public Account getByItemId(String itemId) {
+        return dynamoDBMapper.load(Account.class, itemId);
     }
 
     public void update(Account account) {
