@@ -14,8 +14,9 @@
     <table>
         <tr>
             <c:forEach items="${account.storage}" var="i">
-            <td style="border: 2px solid green;">
+            <td class="border2px">
                 <h2>${i.name}</h2>
+                <h2>${i.type} ${i.points}</h2>
                 <form action="/wear" method="post">
                     <input type="hidden" name="itemId" value="${i.id}" >
                     <input type="submit" value="Wear" class="btn50" >

@@ -24,6 +24,8 @@ public class AccountEntity {
     private ItemEntity legs;
     private ItemEntity weapon;
     private Set<ItemEntity> storage;
+    private Integer level;
+    private Integer points;
 
     private String createdAt;
     private String updatedAt;

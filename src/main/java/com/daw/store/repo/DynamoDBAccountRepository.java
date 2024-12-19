@@ -20,7 +20,7 @@ public class DynamoDBAccountRepository implements AccountRepository {
     @Override
     public boolean exists(Account account) {
         try {
-            Account load = dynamoDBMapper.load(Account.class, ACCOUNT_PREFIX + account.getLogin());
+            var load = dynamoDBMapper.load(Account.class, ACCOUNT_PREFIX + account.getLogin());
             return load != null;
         } catch (Exception e) {
             return false;
@@ -29,7 +29,7 @@ public class DynamoDBAccountRepository implements AccountRepository {
 
     @Override
     public void delete(Account account) {
-        Account load = dynamoDBMapper.load(Account.class, ACCOUNT_PREFIX + account.getLogin());
+        var load = dynamoDBMapper.load(Account.class, ACCOUNT_PREFIX + account.getLogin());
         dynamoDBMapper.delete(load);
     }
 
@@ -39,13 +39,8 @@ public class DynamoDBAccountRepository implements AccountRepository {
     }
 
     @Override
-    public Account getByItemId(String itemId) {
-        return dynamoDBMapper.load(Account.class, itemId);
+    public Account getByItemId(Account account) {
+        return dynamoDBMapper.load(Account.class, account.getId());
     }
 
-    public void update(Account account) {
-        Account load = dynamoDBMapper.load(Account.class, ACCOUNT_PREFIX + account.getLogin());
-        load.setPassword(account.getPassword());
-        dynamoDBMapper.save(load);
-    }
 }

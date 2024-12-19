@@ -4,8 +4,6 @@ import com.daw.store.entity.AccountEntity;
 import com.daw.store.entity.ItemEntity;
 import com.daw.store.service.AccountService;
 import com.daw.store.service.ValidationService;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
@@ -57,12 +55,12 @@ public class ViewController {
     @GetMapping("/success")
     public ModelAndView getSuccess(HttpServletRequest req,
                                    HttpServletResponse resp) throws IOException {
-        log.info("success get");
-        if (getSessionAttribute(req) != null) {
-            var account = accountService.getByLogin(getSessionAttribute(req));
-            var mav = new ModelAndView("main");
-            mav.addObject("account", account);
-            return mav;
+        var login = getSessionAttribute(req);
+        log.info("success get for {}", login);
+        if (login != null) {
+            var account = accountService.getByLogin(login);
+            return new ModelAndView("main")
+                    .addObject("account", account);
         }
         resp.sendRedirect(INDEX_PAGE_PATH);
         return null;
@@ -70,20 +68,20 @@ public class ViewController {
 
     @GetMapping("/shop")
     public ModelAndView getShop(HttpServletRequest req,
-                                   HttpServletResponse resp) throws IOException {
-        log.info("shop get");
-        if (getSessionAttribute(req) != null) {
-            var account = accountService.getByLogin(getSessionAttribute(req));
+                                HttpServletResponse resp) throws IOException {
+        var login = getSessionAttribute(req);
+        log.info("shop get login {}", login);
+        if (login != null) {
+            var account = accountService.getByLogin(login);
             var stuff = new HashSet<ItemEntity>();
             stuff.add(accountService.getItem("ITEM:1"));
             stuff.add(accountService.getItem("ITEM:2"));
             stuff.add(accountService.getItem("ITEM:3"));
             stuff.add(accountService.getItem("ITEM:4"));
             stuff.removeAll(account.getStorage());
-            var mav = new ModelAndView("shop");
-            mav.addObject("account", account);
-            mav.addObject("stuff", stuff);
-            return mav;
+            return new ModelAndView("shop")
+                    .addObject("account", account)
+                    .addObject("stuff", stuff);
         }
         resp.sendRedirect(INDEX_PAGE_PATH);
         return null;
@@ -92,14 +90,12 @@ public class ViewController {
     @GetMapping("/wear")
     public ModelAndView getWear(HttpServletRequest req,
                                 HttpServletResponse resp) throws IOException {
-        log.info("wear get");
-        if (getSessionAttribute(req) != null) {
-            var account = accountService.getByLogin(getSessionAttribute(req));
-
-            var mav = new ModelAndView("wear");
-            mav.addObject("account", account);
-
-            return mav;
+        var login = getSessionAttribute(req);
+        log.info("wear get for {}", login);
+        if (login != null) {
+            var account = accountService.getByLogin(login);
+            return new ModelAndView("wear")
+                    .addObject("account", account);
         }
         resp.sendRedirect(INDEX_PAGE_PATH);
         return null;
@@ -108,12 +104,12 @@ public class ViewController {
     @GetMapping("/update")
     public ModelAndView getUpdate(HttpServletRequest req,
                                   HttpServletResponse resp) throws IOException {
-        log.info("update get");
-        if (getSessionAttribute(req) != null) {
-            var account = accountService.getByLogin(getSessionAttribute(req));
-            var mav = new ModelAndView("update");
-            mav.addObject("account", account);
-            return mav;
+        var login = getSessionAttribute(req);
+        log.info("update get for {}", login);
+        if (login != null) {
+            var account = accountService.getByLogin(login);
+            return new ModelAndView("update")
+                    .addObject("account", account);
         }
         resp.sendRedirect(INDEX_PAGE_PATH);
         return null;
@@ -125,9 +121,7 @@ public class ViewController {
                       HttpServletRequest req,
                       HttpServletResponse resp) {
         log.info("login for {}", login);
-
         var response = restTemplate.getForEntity(String.format(API_GET_URL, login), AccountEntity.class);
-
         var accountEntity = response.getBody();
         if (accountEntity != null && accountService.login(accountEntity, pass)) {
             addSessionAttribute(req, response.getBody().getLogin());
@@ -146,19 +140,18 @@ public class ViewController {
                          HttpServletRequest req,
                          HttpServletResponse resp) {
         log.info("register for {}", login);
-        var accountEntity = new AccountEntity();
-        accountEntity.setLogin(login);
-        accountEntity.setPassword(pass);
-        accountEntity.setPasswordConfirmed(pass2);
+        var accountEntity = AccountEntity.builder()
+                .login(login)
+                .password(pass)
+                .passwordConfirmed(pass2)
+                .build();
         if (email != null && !email.isEmpty() && validationService.validateEmailAddress(email)) {
             accountEntity.setEmail(email);
         }
         if (phone != null && !phone.isEmpty() && validationService.validatePhoneNumber(phone)) {
             accountEntity.setPhone(validationService.formatPhoneNumber(phone));
         }
-
         var response = restTemplate.postForEntity(API_CREATE_URL, accountEntity, AccountEntity.class);
-
         if (response.getBody() != null) {
             addSessionAttribute(req, response.getBody().getLogin());
             redirect(resp, SUCCESS_PAGE_PATH);
@@ -176,8 +169,9 @@ public class ViewController {
                        HttpServletRequest req,
                        HttpServletResponse resp) {
         log.info("update for {}", login);
-        var accountEntity = new AccountEntity();
-        accountEntity.setLogin(login);
+        var accountEntity = AccountEntity.builder()
+                .login(login)
+                .build();
         if (!pass.isEmpty()) {
             accountEntity.setPassword(pass);
             accountEntity.setPasswordConfirmed(pass2);
@@ -202,7 +196,7 @@ public class ViewController {
     @PostMapping("/unlogin")
     public void unlogin(HttpServletRequest req,
                         HttpServletResponse resp) {
-        log.info("unlogin for {}", req.getSession().getAttribute(ATTRIBUTE_LOGIN));
+        log.info("unlogin for {}", getSessionAttribute(req));
         removeSessionAttribute(req);
         redirect(resp, INDEX_PAGE_PATH);
     }
@@ -213,31 +207,27 @@ public class ViewController {
                        HttpServletResponse resp) {
         log.info("delete for {}", login);
         removeSessionAttribute(req);
-
         restTemplate.delete(String.format(API_DELETE_URL, login));
-
         redirect(resp, INDEX_PAGE_PATH);
     }
 
     @PostMapping("/buy")
     public void buy(@RequestParam String itemId,
-                       HttpServletRequest req,
-                       HttpServletResponse resp) {
-        log.info("buy {}", itemId);
-
-        accountService.buy(getSessionAttribute(req), itemId);
-
+                    HttpServletRequest req,
+                    HttpServletResponse resp) {
+        var login = getSessionAttribute(req);
+        log.info("buy {} for {}", itemId, login);
+        accountService.buy(login, itemId);
         redirect(resp, SHOP_PAGE_PATH);
     }
 
     @PostMapping("/sell")
     public void sell(@RequestParam String itemId,
-                    HttpServletRequest req,
-                    HttpServletResponse resp) {
-        log.info("sell {}", itemId);
-
-        accountService.sell(getSessionAttribute(req), itemId);
-
+                     HttpServletRequest req,
+                     HttpServletResponse resp) {
+        var login = getSessionAttribute(req);
+        log.info("sell {} for {}", itemId, login);
+        accountService.sell(login, itemId);
         redirect(resp, SHOP_PAGE_PATH);
     }
 
@@ -245,21 +235,19 @@ public class ViewController {
     public void wear(@RequestParam String itemId,
                      HttpServletRequest req,
                      HttpServletResponse resp) {
-        log.info("wear {}", itemId);
-
-        accountService.wear(getSessionAttribute(req), itemId);
-
+        var login = getSessionAttribute(req);
+        log.info("wear {} for {}", itemId, login);
+        accountService.wear(login, itemId);
         redirect(resp, WEAR_PAGE_PATH);
     }
 
     @PostMapping("/unwear")
     public void unwear(@RequestParam String itemId,
-                     HttpServletRequest req,
-                     HttpServletResponse resp) {
-        log.info("unwear {}", itemId);
-
-        accountService.unwear(getSessionAttribute(req), itemId);
-
+                       HttpServletRequest req,
+                       HttpServletResponse resp) {
+        var login = getSessionAttribute(req);
+        log.info("unwear {} for {}", itemId, login);
+        accountService.unwear(login, itemId);
         redirect(resp, WEAR_PAGE_PATH);
     }
 

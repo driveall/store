@@ -5,12 +5,15 @@ import com.google.i18n.phonenumbers.PhoneNumberUtil;
 import org.springframework.stereotype.Service;
 
 import javax.mail.internet.InternetAddress;
+
 import java.util.regex.Pattern;
+
+import static com.daw.store.Constants.DEFAULT_REGION;
 
 @Service
 public class ValidationService {
-    private static final String DEFAULT_REGION = "UA";
-    private static final Pattern FULL_EMAIL_STRICT_PATTERN = Pattern.compile("[a-z0-9_.&!%+\\-']+@[a-z0-9\\-]+\\.+[a-z]{2,25}$");
+    private static final Pattern FULL_EMAIL_STRICT_PATTERN = Pattern
+            .compile("[a-z0-9_.&!%+\\-']+@[a-z0-9\\-]+\\.+[a-z]{2,25}$");
     private final PhoneNumberUtil phoneNumberUtil = PhoneNumberUtil.getInstance();
 
     public boolean validatePhoneNumber(String phoneNumber) {

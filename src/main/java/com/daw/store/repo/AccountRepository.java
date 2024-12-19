@@ -7,5 +7,5 @@ public interface AccountRepository {
     boolean exists(Account account);
     void delete(Account account);
     Account getByLogin(Account account);
-    Account getByItemId(String itemId);
+    Account getByItemId(Account account);
 }

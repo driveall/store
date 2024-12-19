@@ -39,6 +39,10 @@ public class Account {
     private String weapon;
     @DynamoDBAttribute
     private String storage;
+    @DynamoDBAttribute
+    private Integer level;
+    @DynamoDBAttribute
+    private Integer points;
 
     @DynamoDBAttribute
     private String createdAt;
@@ -51,13 +55,9 @@ public class Account {
     @DynamoDBAttribute
     private String name;
     @DynamoDBAttribute
-    private Integer points;
-    @DynamoDBAttribute
     private String description;
     @DynamoDBAttribute
     private String image;
-    @DynamoDBAttribute
-    private Integer level;
     @DynamoDBAttribute
     private Integer price;
     @DynamoDBAttribute

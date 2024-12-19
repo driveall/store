@@ -22,16 +22,16 @@ public class ItemEntity {
     private Integer price;
     private ItemType type;
 
-    public String toJson() {
+    public String toJson(ObjectMapper mapper) {
         try {
-            return new ObjectMapper().writeValueAsString(this);
+            return mapper.writeValueAsString(this);
         } catch (JsonProcessingException e) {
             return null;
         }
     }
-    public static ItemEntity fromJson(String json) {
+    public static ItemEntity fromJson(String json, ObjectMapper mapper) {
         try {
-            return new ObjectMapper().readValue(json, ItemEntity.class);
+            return mapper.readValue(json, ItemEntity.class);
         } catch (JsonProcessingException e) {
             return null;
         }

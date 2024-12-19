@@ -7,6 +7,8 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.model.*;
+import com.daw.store.dynamodb.entity.Account;
+import com.daw.store.enums.ItemType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,28 +46,90 @@ public class DynamoDbConfig {
                         )
                 )
                 .build();
-        createTable(amazonDynamoDB);
+        createTableAndFillWithItems(amazonDynamoDB);
         return amazonDynamoDB;
     }
 
-    private void createTable(AmazonDynamoDB amazonDynamoDB) {
+    private void createTableAndFillWithItems(AmazonDynamoDB amazonDynamoDB) {
         if (!amazonDynamoDB.listTables().getTableNames().contains(TABLE_NAME)) {
-            CreateTableRequest request = new CreateTableRequest()
-                    .withAttributeDefinitions(new AttributeDefinition(
-                            ATTRIBUTE_ID, ScalarAttributeType.S))
-                    .withKeySchema(new KeySchemaElement(
-                            ATTRIBUTE_ID, KeyType.HASH))
-                    .withProvisionedThroughput(new ProvisionedThroughput(
-                            CAPACITY_UNITS, CAPACITY_UNITS))
-                    .withTableName(TABLE_NAME);
-
-            try {
-                CreateTableResult result = amazonDynamoDB.createTable(request);
-                System.out.println(result.getTableDescription().getTableName());
-            } catch (AmazonServiceException e) {
-                System.err.println(e.getErrorMessage());
-                System.exit(1);
-            }
+            createTable(amazonDynamoDB);
+            fillWithItems(amazonDynamoDB);
         }
     }
+
+    private void deleteTable(AmazonDynamoDB amazonDynamoDB) {
+        amazonDynamoDB.deleteTable(TABLE_NAME);
+    }
+
+    private void createTable(AmazonDynamoDB amazonDynamoDB) {
+        CreateTableRequest request = new CreateTableRequest()
+                .withAttributeDefinitions(new AttributeDefinition(
+                        ATTRIBUTE_ID, ScalarAttributeType.S))
+                .withKeySchema(new KeySchemaElement(
+                        ATTRIBUTE_ID, KeyType.HASH))
+                .withProvisionedThroughput(new ProvisionedThroughput(
+                        CAPACITY_UNITS, CAPACITY_UNITS))
+                .withTableName(TABLE_NAME);
+
+        try {
+            CreateTableResult result = amazonDynamoDB.createTable(request);
+            System.out.println(result.getTableDescription().getTableName());
+        } catch (AmazonServiceException e) {
+            System.err.println(e.getErrorMessage());
+            System.exit(1);
+        }
+    }
+
+    private void fillWithItems(AmazonDynamoDB amazonDynamoDB) {
+        var mapper = new DynamoDBMapper(amazonDynamoDB);
+
+        var item = Account.builder()
+                .id(ITEM_PREFIX + "1")
+                .name("Winter Рat")
+                .description("Low armored item")
+                .price(5)
+                .points(1)
+                .level(1)
+                .type(ItemType.HEAD.name())
+                .image("1")
+                .build();
+        mapper.save(item);
+
+        item = Account.builder()
+                .id(ITEM_PREFIX + "2")
+                .name("Winter Jacket")
+                .description("Low armored item")
+                .price(5)
+                .points(1)
+                .level(1)
+                .type(ItemType.BODY.name())
+                .image("2")
+                .build();
+        mapper.save(item);
+
+        item = Account.builder()
+                .id(ITEM_PREFIX + "3")
+                .name("Winter Boots")
+                .description("Low armored item")
+                .price(5)
+                .points(1)
+                .level(1)
+                .type(ItemType.LEGS.name())
+                .image("3")
+                .build();
+        mapper.save(item);
+
+        item = Account.builder()
+                .id(ITEM_PREFIX + "4")
+                .name("TT Pistol")
+                .description("Low damage item")
+                .price(5)
+                .points(4)
+                .level(1)
+                .type(ItemType.WEAPON.name())
+                .image("4")
+                .build();
+        mapper.save(item);
+    }
+
 }

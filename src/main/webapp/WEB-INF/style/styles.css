@@ -83,3 +83,6 @@ h1 {
 .red {
     color: red;
 }
+.border2px {
+    border: 2px solid green;
+}

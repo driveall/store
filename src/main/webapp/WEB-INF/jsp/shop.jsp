@@ -14,8 +14,9 @@
     <table>
         <tr>
             <c:forEach items="${account.storage}" var="i">
-            <td style="border: 2px solid green;">
+            <td class="border2px">
                 <h2>${i.name}</h2>
+                <h2>${i.type} ${i.price}</h2>
                 <form action="/sell" method="post">
                     <input type="hidden" name="itemId" value="${i.id}" >
                     <input type="submit" value="Sell" class="btn50" >
@@ -29,9 +30,9 @@
     <table>
         <tr>
             <c:forEach items="${stuff}" var="i">
-            <td style="border: 2px solid green;">
+            <td class="border2px">
                 <h2>${i.name}</h2>
-                <h2>${i.type}</h2>
+                <h2>${i.type} ${i.price}</h2>
                 <form action="/buy" method="post">
                     <input type="hidden" name="itemId" value="${i.id}" >
                     <input type="submit" value="Buy" class="btn50" >

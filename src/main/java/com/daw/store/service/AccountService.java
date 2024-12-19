@@ -50,9 +50,9 @@ public class AccountService {
         accountEntity.setPassword(hashPassword(accountEntity.getPassword()).get());
         accountEntity.setMoney(20);
         var storage = new HashSet<ItemEntity>();
-        storage.add(getItem("ITEM:4"));
-        storage.add(getItem("ITEM:1"));
 
+        accountEntity.setLevel(1);
+        accountEntity.setPoints(0);
         accountEntity.setStorage(storage);
         accountEntity.setCreatedAt(DateTime.now().toString());
         accountEntity.setUpdatedAt(DateTime.now().toString());
@@ -94,16 +94,16 @@ public class AccountService {
         } else return null;
     }
 
-    public Optional<String> hashPassword (String password) {
+    public Optional<String> hashPassword(String password) {
         char[] chars = password.toCharArray();
         byte[] bytes = salt.getBytes();
 
-        PBEKeySpec spec = new PBEKeySpec(chars, bytes, ITERATIONS, KEY_LENGTH);
+        var spec = new PBEKeySpec(chars, bytes, ITERATIONS, KEY_LENGTH);
 
         Arrays.fill(chars, Character.MIN_VALUE);
 
         try {
-            SecretKeyFactory fac = SecretKeyFactory.getInstance(ALGORITHM);
+            var fac = SecretKeyFactory.getInstance(ALGORITHM);
             byte[] securePassword = fac.generateSecret(spec).getEncoded();
             return Optional.of(Base64.getEncoder().encodeToString(securePassword));
 
@@ -116,7 +116,9 @@ public class AccountService {
     }
 
     public ItemEntity getItem(String itemId) {
-        var item = accountRepository.getByItemId(itemId);
+        var item = accountRepository.getByItemId(Account.builder()
+                .id(itemId)
+                .build());
         return item != null ? itemEntityMapper.toItemEntity(item) : null;
     }
 
@@ -124,11 +126,12 @@ public class AccountService {
         var account = getByLogin(login);
         var item = getItem(itemId);
         if (account.getMoney() >= item.getPrice()) {
-            var accountToUpdate = new AccountEntity();
-            accountToUpdate.setLogin(login);
-            accountToUpdate.setMoney(account.getMoney() - item.getPrice());
             account.getStorage().add(getItem(itemId));
-            accountToUpdate.setStorage(account.getStorage());
+            var accountToUpdate = AccountEntity.builder()
+                    .login(login)
+                    .money(account.getMoney() - item.getPrice())
+                    .storage(account.getStorage())
+                            .build();
             updateAccount(accountToUpdate);
         }
     }
@@ -136,12 +139,13 @@ public class AccountService {
     public void sell(String login, String itemId) {
         var account = getByLogin(login);
         var item = getItem(itemId);
-
-        var accountToUpdate = new AccountEntity();
-        accountToUpdate.setLogin(login);
-        accountToUpdate.setMoney(account.getMoney() + item.getPrice());
         account.getStorage().remove(getItem(itemId));
-        accountToUpdate.setStorage(account.getStorage());
+
+        var accountToUpdate = AccountEntity.builder()
+                .login(login)
+                .money(account.getMoney() + item.getPrice())
+                .storage(account.getStorage())
+                        .build();
         updateAccount(accountToUpdate);
     }
 

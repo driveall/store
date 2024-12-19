@@ -19,8 +19,9 @@ public class StoreController {
     @GetMapping("/api/get")
     public AccountEntity get(@NonNull @RequestParam String login) {
         log.info("api get for {}", login);
-        var account = new AccountEntity();
-        account.setLogin(login);
+        var account = AccountEntity.builder()
+                .login(login)
+                .build();
         return accountService.getByLogin(account.getLogin());
     }
 
@@ -52,8 +53,9 @@ public class StoreController {
     @DeleteMapping("/api/delete")
     public int delete(@NonNull @RequestParam String login) {
         log.info("api delete for {}", login);
-        var account = new AccountEntity();
-        account.setLogin(login);
+        var account = AccountEntity.builder()
+                .login(login)
+                .build();
         accountService.deleteAccount(account);
         return 200;
     }

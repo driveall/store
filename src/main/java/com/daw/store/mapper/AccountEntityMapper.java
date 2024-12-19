@@ -15,24 +15,35 @@ import java.util.stream.Collectors;
 
 @Service
 public class AccountEntityMapper {
-    public AccountEntity toAccountEntity(Account account, AccountService accountService) {
-        AccountEntity accountEntity = new AccountEntity();
-        accountEntity.setLogin(account.getLogin());
-        accountEntity.setPassword(account.getPassword());
-        accountEntity.setEmail(account.getEmail());
-        accountEntity.setPhone(account.getPhone());
+    private final ObjectMapper objectMapper;
 
-        accountEntity.setMoney(account.getMoney());
+    public AccountEntityMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
+    public AccountEntity toAccountEntity(Account account, AccountService accountService) {
+        var accountEntity = AccountEntity.builder()
+                .login(account.getLogin())
+                .password(account.getPassword())
+                .email(account.getEmail())
+                .phone(account.getPhone())
+                .money(account.getMoney())
+                .level(account.getLevel())
+                .points(account.getPoints())
+                .createdAt(account.getCreatedAt())
+                .updatedAt(account.getUpdatedAt())
+                .passwordChangedAt(account.getPasswordChangedAt())
+                .build();
         if (account.getHead() != null && !account.getHead().isEmpty())
-            accountEntity.setHead(ItemEntity.fromJson(account.getHead()));
+            accountEntity.setHead(ItemEntity.fromJson(account.getHead(), objectMapper));
         if (account.getBody() != null && !account.getBody().isEmpty())
-            accountEntity.setBody(ItemEntity.fromJson(account.getBody()));
+            accountEntity.setBody(ItemEntity.fromJson(account.getBody(), objectMapper));
         if (account.getLegs() != null && !account.getLegs().isEmpty())
-            accountEntity.setLegs(ItemEntity.fromJson(account.getLegs()));
+            accountEntity.setLegs(ItemEntity.fromJson(account.getLegs(), objectMapper));
         if (account.getWeapon() != null && !account.getWeapon().isEmpty())
-            accountEntity.setWeapon(ItemEntity.fromJson(account.getWeapon()));
+            accountEntity.setWeapon(ItemEntity.fromJson(account.getWeapon(), objectMapper));
         try {
-            List<String> itemIds = new ObjectMapper().readValue(account.getStorage(), LinkedList.class);
+            List<String> itemIds = objectMapper.readValue(account.getStorage(), LinkedList.class);
             Set<ItemEntity> items = itemIds.stream()
                     .map(accountService::getItem)
                     .collect(Collectors.toSet());
@@ -40,38 +51,34 @@ public class AccountEntityMapper {
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-
-        accountEntity.setCreatedAt(account.getCreatedAt());
-        accountEntity.setUpdatedAt(account.getUpdatedAt());
-        accountEntity.setPasswordChangedAt(account.getPasswordChangedAt());
         return accountEntity;
     }
     public Account toAccount(AccountEntity accountEntity) {
-        Account account = new Account();
-        account.setId(Constants.ACCOUNT_PREFIX + accountEntity.getLogin());
-        account.setLogin(accountEntity.getLogin());
-        account.setPassword(accountEntity.getPassword());
-        account.setEmail(accountEntity.getEmail());
-        account.setPhone(accountEntity.getPhone());
-
-        account.setMoney(accountEntity.getMoney());
-        if (accountEntity.getHead() != null) account.setHead(accountEntity.getHead().toJson());
-        if (accountEntity.getBody() != null) account.setBody(accountEntity.getBody().toJson());
-        if (accountEntity.getLegs() != null) account.setLegs(accountEntity.getLegs().toJson());
-        if (accountEntity.getWeapon() != null) account.setWeapon(accountEntity.getWeapon().toJson());
+        var account = Account.builder()
+                .id(Constants.ACCOUNT_PREFIX + accountEntity.getLogin())
+                .login(accountEntity.getLogin())
+                .password(accountEntity.getPassword())
+                .email(accountEntity.getEmail())
+                .phone(accountEntity.getPhone())
+                .money(accountEntity.getMoney())
+                .level(accountEntity.getLevel())
+                .points(accountEntity.getPoints())
+                .createdAt(accountEntity.getCreatedAt())
+                .updatedAt(accountEntity.getUpdatedAt())
+                .passwordChangedAt(accountEntity.getPasswordChangedAt())
+                .build();
+        if (accountEntity.getHead() != null) account.setHead(accountEntity.getHead().toJson(objectMapper));
+        if (accountEntity.getBody() != null) account.setBody(accountEntity.getBody().toJson(objectMapper));
+        if (accountEntity.getLegs() != null) account.setLegs(accountEntity.getLegs().toJson(objectMapper));
+        if (accountEntity.getWeapon() != null) account.setWeapon(accountEntity.getWeapon().toJson(objectMapper));
         try {
             var itemIds = accountEntity.getStorage().stream()
                     .map(ItemEntity::getId)
                     .collect(Collectors.toList());
-            account.setStorage(new ObjectMapper().writeValueAsString(itemIds));
+            account.setStorage(objectMapper.writeValueAsString(itemIds));
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
-
-        account.setCreatedAt(accountEntity.getCreatedAt());
-        account.setUpdatedAt(accountEntity.getUpdatedAt());
-        account.setPasswordChangedAt(accountEntity.getPasswordChangedAt());
-
         return account;
     }
     public void prepareUpdateEntity(AccountEntity load, AccountEntity accountEntity) {
@@ -85,6 +92,8 @@ public class AccountEntityMapper {
         if (accountEntity.getLegs() != null) load.setLegs(accountEntity.getLegs());
         if (accountEntity.getWeapon() != null) load.setWeapon(accountEntity.getWeapon());
         if (accountEntity.getStorage() != null) load.setStorage(accountEntity.getStorage());
+        if (accountEntity.getLevel() != null) load.setLevel(accountEntity.getLevel());
+        if (accountEntity.getPoints() != null) load.setPoints(accountEntity.getPoints());
 
         if (accountEntity.getCreatedAt() != null) load.setCreatedAt(accountEntity.getCreatedAt());
         if (accountEntity.getUpdatedAt() != null) load.setUpdatedAt(accountEntity.getUpdatedAt());
