@@ -2,8 +2,8 @@ package com.daw.store.controller;
 
 import com.daw.store.entity.AccountEntity;
 import com.daw.store.entity.ItemEntity;
-import com.daw.store.service.AccountService;
 import com.daw.store.service.ValidationService;
+import com.daw.store.service.ViewService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
@@ -11,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
@@ -25,16 +24,15 @@ import static com.daw.store.Constants.ATTRIBUTE_LOGIN;
 @Controller
 @Slf4j
 public class ViewController {
-    private final AccountService accountService;
+    private final ViewService viewService;
     private final ValidationService validationService;
-    private final RestTemplate restTemplate = new RestTemplate();
 
-    public ViewController(AccountService accountService, ValidationService validationService) {
-        this.accountService = accountService;
+    public ViewController(ViewService viewService, ValidationService validationService) {
+        this.viewService = viewService;
         this.validationService = validationService;
     }
 
-    @RequestMapping("/index")
+    @GetMapping("/index")
     public ModelAndView getIndex() {
         log.info("index get");
         return new ModelAndView("index");
@@ -58,7 +56,7 @@ public class ViewController {
         var login = getSessionAttribute(req);
         log.info("success get for {}", login);
         if (login != null) {
-            var account = accountService.getByLogin(login);
+            var account = viewService.getByLogin(login);
             return new ModelAndView("main")
                     .addObject("account", account);
         }
@@ -72,12 +70,12 @@ public class ViewController {
         var login = getSessionAttribute(req);
         log.info("shop get login {}", login);
         if (login != null) {
-            var account = accountService.getByLogin(login);
+            var account = viewService.getByLogin(login);
             var stuff = new HashSet<ItemEntity>();
-            stuff.add(accountService.getItem("ITEM:1"));
-            stuff.add(accountService.getItem("ITEM:2"));
-            stuff.add(accountService.getItem("ITEM:3"));
-            stuff.add(accountService.getItem("ITEM:4"));
+            stuff.add(viewService.getItem("ITEM:1"));
+            stuff.add(viewService.getItem("ITEM:2"));
+            stuff.add(viewService.getItem("ITEM:3"));
+            stuff.add(viewService.getItem("ITEM:4"));
             stuff.removeAll(account.getStorage());
             return new ModelAndView("shop")
                     .addObject("account", account)
@@ -93,7 +91,7 @@ public class ViewController {
         var login = getSessionAttribute(req);
         log.info("wear get for {}", login);
         if (login != null) {
-            var account = accountService.getByLogin(login);
+            var account = viewService.getByLogin(login);
             return new ModelAndView("wear")
                     .addObject("account", account);
         }
@@ -107,7 +105,7 @@ public class ViewController {
         var login = getSessionAttribute(req);
         log.info("update get for {}", login);
         if (login != null) {
-            var account = accountService.getByLogin(login);
+            var account = viewService.getByLogin(login);
             return new ModelAndView("update")
                     .addObject("account", account);
         }
@@ -121,10 +119,9 @@ public class ViewController {
                       HttpServletRequest req,
                       HttpServletResponse resp) {
         log.info("login for {}", login);
-        var response = restTemplate.getForEntity(String.format(API_GET_URL, login), AccountEntity.class);
-        var accountEntity = response.getBody();
-        if (accountEntity != null && accountService.login(accountEntity, pass)) {
-            addSessionAttribute(req, response.getBody().getLogin());
+        var accountEntity = viewService.getByLogin(login);
+        if (accountEntity != null && viewService.login(accountEntity, pass)) {
+            addSessionAttribute(req, accountEntity.getLogin());
             redirect(resp, SUCCESS_PAGE_PATH);
         } else {
             redirect(resp, INDEX_PAGE_PATH);
@@ -151,9 +148,10 @@ public class ViewController {
         if (phone != null && !phone.isEmpty() && validationService.validatePhoneNumber(phone)) {
             accountEntity.setPhone(validationService.formatPhoneNumber(phone));
         }
-        var response = restTemplate.postForEntity(API_CREATE_URL, accountEntity, AccountEntity.class);
-        if (response.getBody() != null) {
-            addSessionAttribute(req, response.getBody().getLogin());
+        viewService.createAccount(accountEntity);
+        accountEntity = viewService.getByLogin(login);
+        if (accountEntity != null) {
+            addSessionAttribute(req, accountEntity.getLogin());
             redirect(resp, SUCCESS_PAGE_PATH);
         } else {
             redirect(resp, INDEX_PAGE_PATH);
@@ -172,7 +170,7 @@ public class ViewController {
         var accountEntity = AccountEntity.builder()
                 .login(login)
                 .build();
-        if (!pass.isEmpty()) {
+        if (!pass.isEmpty() && pass.equals(pass2)) {
             accountEntity.setPassword(pass);
             accountEntity.setPasswordConfirmed(pass2);
         }
@@ -183,10 +181,10 @@ public class ViewController {
             accountEntity.setPhone(validationService.formatPhoneNumber(phone));
         }
 
-        var response = restTemplate.postForEntity(API_UPDATE_URL, accountEntity, AccountEntity.class);
-
-        if (response.getBody() != null) {
-            addSessionAttribute(req, response.getBody().getLogin());
+        viewService.updateAccount(accountEntity);
+        accountEntity = viewService.getByLogin(login);
+        if (accountEntity != null) {
+            addSessionAttribute(req, accountEntity.getLogin());
             redirect(resp, SUCCESS_PAGE_PATH);
         } else {
             redirect(resp, INDEX_PAGE_PATH);
@@ -207,7 +205,7 @@ public class ViewController {
                        HttpServletResponse resp) {
         log.info("delete for {}", login);
         removeSessionAttribute(req);
-        restTemplate.delete(String.format(API_DELETE_URL, login));
+        viewService.deleteAccount(login);
         redirect(resp, INDEX_PAGE_PATH);
     }
 
@@ -217,7 +215,7 @@ public class ViewController {
                     HttpServletResponse resp) {
         var login = getSessionAttribute(req);
         log.info("buy {} for {}", itemId, login);
-        accountService.buy(login, itemId);
+        viewService.buy(login, itemId);
         redirect(resp, SHOP_PAGE_PATH);
     }
 
@@ -227,7 +225,7 @@ public class ViewController {
                      HttpServletResponse resp) {
         var login = getSessionAttribute(req);
         log.info("sell {} for {}", itemId, login);
-        accountService.sell(login, itemId);
+        viewService.sell(login, itemId);
         redirect(resp, SHOP_PAGE_PATH);
     }
 
@@ -237,7 +235,7 @@ public class ViewController {
                      HttpServletResponse resp) {
         var login = getSessionAttribute(req);
         log.info("wear {} for {}", itemId, login);
-        accountService.wear(login, itemId);
+        viewService.wear(login, itemId);
         redirect(resp, WEAR_PAGE_PATH);
     }
 
@@ -247,7 +245,7 @@ public class ViewController {
                        HttpServletResponse resp) {
         var login = getSessionAttribute(req);
         log.info("unwear {} for {}", itemId, login);
-        accountService.unwear(login, itemId);
+        viewService.unwear(login, itemId);
         redirect(resp, WEAR_PAGE_PATH);
     }
 

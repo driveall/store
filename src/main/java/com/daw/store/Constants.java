@@ -14,6 +14,7 @@ public class Constants {
     public static final String SUCCESS_PAGE_PATH = "/success";
 
     public static final String API_GET_URL = "http://localhost:8080/api/get?login=%s";
+    public static final String API_GET_ITEM_URL = "http://localhost:8080/api/get-item?itemId=%s";
     public static final String API_CREATE_URL = "http://localhost:8080/api/create";
     public static final String API_UPDATE_URL = "http://localhost:8080/api/update";
     public static final String API_DELETE_URL = "http://localhost:8080/api/delete?login=%s";

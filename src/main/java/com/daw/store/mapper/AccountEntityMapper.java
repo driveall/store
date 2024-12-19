@@ -4,7 +4,7 @@ import com.daw.store.Constants;
 import com.daw.store.dynamodb.entity.Account;
 import com.daw.store.entity.AccountEntity;
 import com.daw.store.entity.ItemEntity;
-import com.daw.store.service.AccountService;
+import com.daw.store.service.StoreService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +21,7 @@ public class AccountEntityMapper {
         this.objectMapper = objectMapper;
     }
 
-    public AccountEntity toAccountEntity(Account account, AccountService accountService) {
+    public AccountEntity toAccountEntity(Account account, StoreService accountService) {
         var accountEntity = AccountEntity.builder()
                 .login(account.getLogin())
                 .password(account.getPassword())
