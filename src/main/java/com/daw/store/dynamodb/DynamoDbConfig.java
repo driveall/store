@@ -85,7 +85,7 @@ public class DynamoDbConfig {
 
         var item = Account.builder()
                 .id(ITEM_PREFIX + "1")
-                .name("Winter Рat")
+                .name("Winter Hat")
                 .description("Low armored item")
                 .price(5)
                 .points(1)
@@ -128,6 +128,54 @@ public class DynamoDbConfig {
                 .level(1)
                 .type(ItemType.WEAPON.name())
                 .image("4")
+                .build();
+        mapper.save(item);
+
+        item = Account.builder()
+                .id(ITEM_PREFIX + "5")
+                .name("Army Hat")
+                .description("Low armored item")
+                .price(20)
+                .points(2)
+                .level(2)
+                .type(ItemType.HEAD.name())
+                .image("5")
+                .build();
+        mapper.save(item);
+
+        item = Account.builder()
+                .id(ITEM_PREFIX + "6")
+                .name("Army Jacket")
+                .description("Low armored item")
+                .price(20)
+                .points(2)
+                .level(2)
+                .type(ItemType.BODY.name())
+                .image("6")
+                .build();
+        mapper.save(item);
+
+        item = Account.builder()
+                .id(ITEM_PREFIX + "7")
+                .name("Army Boots")
+                .description("Low armored item")
+                .price(20)
+                .points(2)
+                .level(2)
+                .type(ItemType.LEGS.name())
+                .image("7")
+                .build();
+        mapper.save(item);
+
+        item = Account.builder()
+                .id(ITEM_PREFIX + "8")
+                .name("Desert Eagle")
+                .description("Low damage item")
+                .price(35)
+                .points(9)
+                .level(2)
+                .type(ItemType.WEAPON.name())
+                .image("8")
                 .build();
         mapper.save(item);
     }
