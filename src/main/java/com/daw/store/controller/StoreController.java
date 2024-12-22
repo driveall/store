@@ -1,7 +1,9 @@
 package com.daw.store.controller;
 
 import com.daw.store.entity.AccountEntity;
+import com.daw.store.entity.Accounts;
 import com.daw.store.entity.ItemEntity;
+import com.daw.store.entity.Items;
 import com.daw.store.service.StoreService;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -23,10 +25,26 @@ public class StoreController {
         return storeService.getByLogin(login);
     }
 
+    @GetMapping("/api/get-all")
+    public Accounts getAll() {
+        log.info("api getAll");
+        return Accounts.builder()
+                .accounts(storeService.getAllAccounts())
+                .build();
+    }
+
     @GetMapping("/api/get-item")
     public ItemEntity getItem(@NonNull @RequestParam String itemId) {
         log.info("api getItem {}", itemId);
         return storeService.getItem(itemId);
+    }
+
+    @GetMapping("/api/get-all-items")
+    public Items getAllItems() {
+        log.info("api getAllItems");
+        return Items.builder()
+                .items(storeService.getAllItems())
+                .build();
     }
 
     @PostMapping("/api/create")

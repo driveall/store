@@ -29,7 +29,7 @@ public class ItemEntityMapper {
                 .image(item.getImage())
                 .level(item.getLevel())
                 .points(item.getPoints())
-                .type(ItemType.valueOf(item.getType()))
+                .type(item.getType() != null ? ItemType.valueOf(item.getType()) : null)
                 .build();
     }
 }

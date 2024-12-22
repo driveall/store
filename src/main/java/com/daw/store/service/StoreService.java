@@ -8,6 +8,9 @@ import com.daw.store.mapper.ItemEntityMapper;
 import com.daw.store.repo.AccountRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedList;
+import java.util.List;
+
 @Service
 public class StoreService {
 
@@ -59,6 +62,23 @@ public class StoreService {
                 .id(itemId)
                 .build());
         return item != null ? itemEntityMapper.toItemEntity(item) : null;
+    }
+
+    public List<ItemEntity> getAllItems() {
+        var items = accountRepository.getAllItems();
+        List<ItemEntity> itemEntityList = new LinkedList<>();
+        for (Account e : items) {
+            itemEntityList.add(itemEntityMapper.toItemEntity(e));
+        }
+        return itemEntityList;
+    }
+    public List<AccountEntity> getAllAccounts() {
+        var items = accountRepository.getAllAccounts();
+        List<AccountEntity> accountEntityList = new LinkedList<>();
+        for (Account e : items) {
+            accountEntityList.add(accountEntityMapper.toAccountEntity(e, this));
+        }
+        return accountEntityList;
     }
 
     private void prepareUpdateEntity(AccountEntity load, AccountEntity accountEntity) {

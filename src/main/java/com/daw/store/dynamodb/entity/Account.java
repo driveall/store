@@ -11,6 +11,7 @@ import static com.daw.store.Constants.TABLE_NAME;
 @Getter
 @Setter
 @Builder
+@ToString
 @AllArgsConstructor
 @NoArgsConstructor
 @DynamoDBTable(tableName = TABLE_NAME)
