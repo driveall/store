@@ -59,6 +59,12 @@ dependencies {
     // Logging - Log4j2
     annotationProcessor 'org.apache.logging.log4j:log4j-core:2.21.1'
 
+    // phone validation
+    implementation 'com.googlecode.libphonenumber:libphonenumber:8.13.32'
+
+    // email validation
+    implementation 'com.sun.mail:javax.mail:1.6.2'
+
     // spring security (includes bcrypt)
     implementation 'org.springframework.security:spring-security-crypto:6.3.0'
 

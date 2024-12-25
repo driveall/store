@@ -9,4 +9,6 @@ public class Constants {
 
     public static final Long CAPACITY_UNITS = 10L;
 
+    public static final String DEFAULT_REGION = "UA";
+
 }
