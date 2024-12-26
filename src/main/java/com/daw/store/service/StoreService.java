@@ -54,7 +54,7 @@ public class StoreService {
             accountEntity.setUpdatedAt(DateTime.now().toString());
             accountEntity.setPasswordChangedAt(DateTime.now().toString());
 
-            createAccount(accountEntity);
+            accountRepository.save(accountEntityMapper.toAccount(accountEntity));
         }
     }
 

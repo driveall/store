@@ -1,6 +1,5 @@
 package com.daw.store.repo;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.PaginatedScanList;
 import com.daw.store.dynamodb.entity.Account;
 
 import java.util.List;
